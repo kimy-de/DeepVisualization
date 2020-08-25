@@ -27,7 +27,7 @@ python main.py --layer_num 3
 
 ## layer 10
 ```
-python main.py --layer_num 10 --model_name --modified_alexnet
+python main.py --layer_num 10 --model_name modified_alexnet
 ```
 <img width="936" alt="layer10" src="https://user-images.githubusercontent.com/52735725/90338355-65695f80-dfe9-11ea-90c4-27465164d002.png">
 
