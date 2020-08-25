@@ -9,7 +9,7 @@ import scipy.ndimage as nd
 import PIL.Image
 from tqdm import tqdm
 
-def init_image(size=(400, 400, 3)):
+def init_image(size=(512, 512, 3)):
 
     normalise = transforms.Compose([
         transforms.ToTensor(),
@@ -27,6 +27,7 @@ def tensor_to_img(t):
     inp = a[0, :, :, :]
     inp = inp.transpose(1, 2, 0)
     inp = std * inp + mean
+    #inp = (inp-np.min(inp))/(np.max(inp)-np.min(inp))
     inp *= 255
     inp = np.uint8(np.clip(inp, 0, 255))
     return PIL.Image.fromarray(inp)
@@ -56,7 +57,7 @@ def octaver_fn(model, base_img, step_fn, octave_n=6, octave_scale=1.4, iter_n=10
     return src
 
 # Filter visualization
-def filter_step(model, img, layer_index, filter_index, step_size=3, use_L2=False):
+def filter_step(model, img, layer_index, filter_index, step_size=5, use_L2=False):
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     mean = np.array([0.485, 0.456, 0.406]).reshape([3, 1, 1])
@@ -68,15 +69,16 @@ def filter_step(model, img, layer_index, filter_index, step_size=3, use_L2=False
     optimizer = Adam([img_var], lr=step_size, weight_decay=1e-4)
 
     x = img_var
+   
     for index, layer in enumerate(model.features):
 
         x = layer(x)
         if index == layer_index:
 
             break
-
+    
     output = x[0, filter_index]
-    loss =  output.norm() #torch.mean(output)
+    loss =  -torch.mean(output)
     loss.backward()
 
     if use_L2 == True:
@@ -94,18 +96,18 @@ def filter_step(model, img, layer_index, filter_index, step_size=3, use_L2=False
     return torch.Tensor(result)
 
 def visualize_filter(model, base_img, layer_index, filter_index,
-                     octave_n=6, octave_scale=1.4, iter_n=10,
-                     step_size=3, use_L2=False):
+                     octave_n, octave_scale, iter_n,
+                     step_size, display, use_L2):
     return octaver_fn(
         model, base_img, step_fn=filter_step,
         octave_n=octave_n, octave_scale=octave_scale,
-        iter_n=iter_n, layer_index=layer_index,
+        iter_n=iter_n, layer_index=layer_index, 
         filter_index=filter_index, step_size=step_size,
         use_L2=use_L2
     )
 
 # Show
-def show_layer(model, layer_num, img_size, save_path, filter_start=10, filter_end=20, step_size=3, use_L2=False):
+def show_layer(model, layer_num, img_size, save_path, filter_start=10, filter_end=20, step_size= 0.05,  use_L2=False):
 
     img_np = init_image(size=(img_size, img_size, 3))
 
@@ -114,10 +116,14 @@ def show_layer(model, layer_num, img_size, save_path, filter_start=10, filter_en
 
         filter = visualize_filter(model, img_np, layer_num,
                                   filter_index=i,
-                                  octave_n=2,
-                                  iter_n=20,
+                                  octave_scale=1.2,
+                                  octave_n=6,
+                                  iter_n=15,
                                   step_size=step_size,
+                                  display=True,
                                   use_L2=use_L2)
 
-        filter_img = tensor_to_img(filter)
+        filter_img = tensor_to_img(filter)#.convert('LA')
+        
         filter_img.save(save_path + title + ".png")
+        
