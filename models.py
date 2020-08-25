@@ -1,6 +1,7 @@
 import torch.nn as nn
 import torch
 from torchvision import models
+import torch.nn.functional as F
 
 class ModifiedAlexNet(nn.Module):
     def __init__(self):
@@ -42,8 +43,11 @@ class ModelFactory():
             model.load_state_dict(torch.load('./pretrained_publishinghouse.pth'))
 
         elif modeltype == 'custom':
-            # Declare your model class like the example above.
             pass
+            # Declare your model class
+        
+        elif modeltype == 'vgg16':   
+            model = models.vgg16(pretrained=True)
 
         else:
             print("Please check the model name again.")
