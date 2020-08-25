@@ -17,7 +17,7 @@ Deep visualization is to show the visualization of an optimized image generated 
 ```
 !python main.py --img_size 512 --layer_num 5 --filter_start 0 --filter_end 100 --step_size 3 --model_name vgg16
 ```
-<img width="988" alt="5" src="https://user-images.githubusercontent.com/52735725/91222262-39538a00-e71f-11ea-9320-08df6106f085.png">
+<img width="988" alt="5" src="https://user-images.githubusercontent.com/52735725/91223078-62284f00-e720-11ea-9428-e6d70492d356.png">
 
 ## layer 14
 
