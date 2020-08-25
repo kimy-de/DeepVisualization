@@ -12,7 +12,6 @@ if __name__ == "__main__":
     parser.add_argument('--save_path', default='./pictures/', type=str, help='save path')
     parser.add_argument('--filter_start', default=10, type=int, help='filter start')
     parser.add_argument('--filter_end', default=20, type=int, help='filter end')
-    parser.add_argument('--parallel', default=1, type=int, help='parallel')
     parser.add_argument('--step_size', default=0.1, type=float, help='step size')
 
     args = parser.parse_args()
@@ -23,7 +22,6 @@ if __name__ == "__main__":
 
     # Execute
     visualization.show_layer(model, args.layer_num, args.img_size, args.save_path,
-                             parallel = args.parallel,
                              filter_start=args.filter_start,
                              filter_end=args.filter_end,
                              step_size= args.step_size,
